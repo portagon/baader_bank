@@ -75,3 +75,17 @@ RSpec.describe BaaderBank::Authenticator do
     end
   end
 end
+
+RSpec.describe BaaderBank::Authenticator::MemoryTokenStore do
+  subject(:store) { described_class.new }
+
+  it "returns nil before anything has been written" do
+    expect(store.read).to be_nil
+  end
+
+  it "returns the last-written token" do
+    store.write({ access_token: "a", refresh_token: "b", expires_on: 123 })
+
+    expect(store.read).to eq({ access_token: "a", refresh_token: "b", expires_on: 123 })
+  end
+end

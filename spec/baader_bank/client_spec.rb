@@ -61,4 +61,39 @@ RSpec.describe BaaderBank::Client do
         .with(body: xml)
     end
   end
+
+  describe "#put" do
+    it "sends a JSON body and returns the parsed response" do
+      stub_api(:put, "some/path", body: { updated: true })
+
+      result = client.put("some/path", { name: "changed" })
+
+      expect(result).to eq({ "updated" => true })
+      expect(WebMock).to have_requested(:put, "https://konto.baaderbank.example/api/some/path")
+        .with(body: { name: "changed" }.to_json)
+    end
+  end
+
+  describe "#delete" do
+    it "sends the request and returns the parsed response" do
+      stub_api(:delete, "some/path", status: 200, body: {})
+
+      client.delete("some/path")
+
+      expect(WebMock).to have_requested(:delete, "https://konto.baaderbank.example/api/some/path")
+    end
+  end
+
+  describe "network-level failures" do
+    it "wraps a connection failure in an untyped Error carrying the underlying message" do
+      stub_request(:get, "https://konto.baaderbank.example/api/accounts/12345/balance")
+        .to_raise(Faraday::ConnectionFailed.new("Connection refused"))
+
+      expect { client.account_balance("12345") }.to raise_error(BaaderBank::Error) do |error|
+        expect(error).not_to be_a(BaaderBank::Error::ServerError) # no HTTP response to classify by
+        expect(error.status).to be_nil
+        expect(error.message).to include("Connection refused")
+      end
+    end
+  end
 end

@@ -39,3 +39,10 @@ def stub_login(access_token: "access-token-1", refresh_token: "refresh-token-1",
       }.to_json
     )
 end
+
+# Stubs a single API call under the configured base URL. `path` must not
+# start with "/" (see Configuration#base_url= for why that matters).
+def stub_api(method, path, status: 200, body: {})
+  stub_request(method, "https://konto.baaderbank.example/api/#{path}")
+    .to_return(status: status, headers: { "Content-Type" => "application/json" }, body: body.to_json)
+end
