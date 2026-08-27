@@ -1,27 +1,32 @@
-# BaaderBank
+# Baader Bank
 
-A Ruby client for the [Baader Bank Customer REST API](https://konto.baaderbank.de/apidoc/), encapsulating
-authentication, error handling, and resource methods (accounts, orders, securities accounts, payments, and
-related resources) behind a single `BaaderBank::Client`.
-
-This gem exists to replace `skynet`'s current SFTP/form-POST-based Baader Bank integration with the documented
-REST API. See `skynet`'s `docs/BAADER_BANK_*.md` for the current (pre-migration) architecture.
+A Ruby client for the [Baader Bank Customer REST API](https://konto.baaderbank.de/apidoc/). It provides
+authentication, token refresh, typed error handling, document uploads, and resource methods for accounts,
+orders, securities accounts, payments, and related endpoints through a single `BaaderBank::Client`.
 
 ## Installation
 
-Not yet published to a gem server. Point at this repo directly from the consuming app's Gemfile:
+Add the gem to your `Gemfile`:
 
 ```ruby
-gem "baader_bank", git: "https://github.com/portagon/baader_bank", branch: "main"
+source 'https://rubygems.pkg.github.com/portagon' do
+  gem 'baader_bank'
+end
+```
+
+To use the latest code directly from the repository instead, use the Git source:
+
+```ruby
+gem 'baader_bank', git: 'https://github.com/portagon/baader_bank', branch: 'main'
 ```
 
 ## Usage
 
-Configure once, e.g. from a Rails initializer:
+Configure the client once, for example in a Rails initializer:
 
 ```ruby
 BaaderBank.configure do |config|
-  config.base_url = "https://konto.baaderbank.de/api" # or the sandbox URL once Baader provides one
+  config.base_url = "https://konto.baaderbank.de/api"
   config.api_key   = Rails.application.credentials.baader_bank[:api_key]
   config.user_id   = Rails.application.credentials.baader_bank[:client_user_id]
   config.pin       = Rails.application.credentials.baader_bank[:client_pin]
@@ -29,7 +34,7 @@ BaaderBank.configure do |config|
 end
 ```
 
-When configured, the proxy is used for login, token refresh, and all resource requests. `proxy` accepts any
+The proxy is optional and applies to login, token refresh, and all resource requests. It accepts any
 Faraday-compatible proxy value, including a URL string or an options hash.
 
 Then obtain a client and call resource methods:
@@ -50,7 +55,7 @@ the API's `code`/`title`/`detail` fields:
 begin
   client.account_balance("does-not-exist")
 rescue BaaderBank::Error::NotFoundError => e
-  Honeybadger.notify(e, context: { baader_code: e.code, baader_title: e.title })
+  logger.error("Baader Bank request failed: #{e.code} - #{e.title}")
 end
 ```
 
@@ -58,9 +63,9 @@ end
 
 Login (`POST /login`) and token refresh (`POST /token/refresh`) are handled transparently by
 `BaaderBank::Authenticator` - every resource call gets a valid bearer token, refreshing or re-logging in as
-needed. By default tokens are cached in-process only (`Authenticator::MemoryTokenStore`), which is fine for a
-single long-lived process but **not** shared across multiple dynos/workers. To share a token across processes,
-inject a store that responds to `#read` and `#write(token)`, e.g. backed by `Rails.cache`:
+needed. By default, tokens are cached in-process using `Authenticator::MemoryTokenStore`. Applications running
+multiple processes or instances should inject a shared store that responds to `#read` and `#write(token)`, for
+example one backed by `Rails.cache`:
 
 ```ruby
 class RailsCacheTokenStore
@@ -78,38 +83,37 @@ end
 BaaderBank.configure { |c| c.token_store = RailsCacheTokenStore.new }
 ```
 
-### Uploading documents (replacing SFTP)
+### Uploading documents
 
 `upload_order_documents`, `upload_opening_documents`, `upload_closing_documents`, and `upload_changing_documents`
 all take a file path or IO plus a `document_date_time:`, multipart-POST the ZIP, and compute the required
-`checksumSha256` automatically. A `202` response confirms receipt only - it is not the same guarantee as the old
-SFTP `.ok` file plus daily CSV reconciliation, since Baader hasn't documented whether `202` implies successful
-downstream processing.
+`checksumSha256` automatically. A `202` response confirms that the request was accepted; applications should
+verify downstream processing separately when their workflow requires it.
 
-## Known gaps / open questions for Baader
+## API notes and limitations
 
-These are tracked because the OpenAPI spec (v2.5.0) doesn't fully answer them - see the module-level comments
-in `lib/baader_bank/client/*.rb` for where each one matters:
+The published OpenAPI specification (v2.5.0) leaves some behavior unspecified. Relevant implementation details
+are also documented in `lib/baader_bank/client/*.rb`:
 
-- No sandbox/test server is listed (only `Produktion`) - already raised with Baader in the 2026-08 migration call.
-- `GET /asset-manager/files/{file-type}` uses a `CSV1/2/3/N/K` + `PDF1/2/3/N` enum not yet mapped to the legacy
-  record types (RKK/WDP/WUM/AKS/AEA) the current SFTP-era parsers expect.
+- The API documentation lists only the production server and does not currently identify a sandbox endpoint.
+- `GET /asset-manager/files/{file-type}` uses the `CSV1/2/3/N/K` and `PDF1/2/3/N` file-type values without
+  describing their business-level contents.
 - `POST /orders/upload/ordering` doesn't document how Baader distinguishes a block-order ZIP from a breakdown ZIP.
 - The documented access-token lifetime is inconsistent between the security scheme (60 min) and the refresh
   endpoint description (5 min) - `Authenticator` doesn't assume either and always trusts the response's
   `expires_on`.
 - `POST /token/refresh` requires the *expired* access token as a Bearer header **and** the refresh token in the
-  body (per the spec's `security` requirement on that endpoint) - implemented, but unverified against a live API.
+  body, following the endpoint's published security requirements.
 - Several endpoints (`interday-payments`, `interday-account-openings` on Customer/Asset-Managers, the base
   `GET /customers/{id}`, `GET /deposits/{securities-account}/mt535`) only exist as `deprecated: true` with no
-  documented `v2` replacement - implemented as-is since there's no alternative, flagged in code comments.
+  documented `v2` replacement. The client keeps these endpoints available and flags them in code comments.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then run `bundle exec rspec` to run the
-tests (WebMock-stubbed, no network access) and `bundle exec rubocop` for style. `bin/console` gives an
-interactive prompt for experimentation.
+After checking out the repository, run `bin/setup` to install dependencies. Run `bundle exec rake` to execute
+the WebMock-backed test suite and RuboCop checks. No live API access is required. Use `bin/console` for an
+interactive prompt.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/portagon/baader_bank.
+Bug reports and pull requests are welcome on [GitHub](https://github.com/portagon/baader_bank).
