@@ -15,8 +15,8 @@ Gem::Specification.new do |spec|
     Customer API (accounts, orders, securities accounts, payments, and related resources).
   DESC
 
-  spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri'] = 'https://github.com/portagon/baader_bank'
+  spec.metadata['homepage_uri'] = spec.metadata['source_code_uri'] = spec.homepage
+  spec.metadata['github_repo'] = 'ssh://github.com/portagon/baader_bank'
 
   spec.required_ruby_version = '~> 3.4'
   spec.bindir = 'exe'

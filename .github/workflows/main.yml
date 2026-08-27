@@ -3,9 +3,12 @@ name: Ruby
 on:
   push:
     branches:
-      - master
+      - main
 
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -14,7 +17,7 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - '3.4.9'
+          - '3.4'
 
     steps:
       - uses: actions/checkout@v4
