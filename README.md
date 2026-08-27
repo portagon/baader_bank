@@ -25,8 +25,12 @@ BaaderBank.configure do |config|
   config.api_key   = Rails.application.credentials.baader_bank[:api_key]
   config.user_id   = Rails.application.credentials.baader_bank[:client_user_id]
   config.pin       = Rails.application.credentials.baader_bank[:client_pin]
+  config.proxy     = ENV["BAADER_BANK_PROXY"] # optional, e.g. http://user:password@proxy.example:8080
 end
 ```
+
+When configured, the proxy is used for login, token refresh, and all resource requests. `proxy` accepts any
+Faraday-compatible proxy value, including a URL string or an options hash.
 
 Then obtain a client and call resource methods:
 

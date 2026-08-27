@@ -16,12 +16,13 @@ module BaaderBank
     DEFAULT_OPEN_TIMEOUT = 10
 
     attr_reader :base_url
-    attr_accessor :api_key, :user_id, :pin, :timeout, :open_timeout, :token_store, :logger
+    attr_accessor :api_key, :user_id, :pin, :timeout, :open_timeout, :proxy, :token_store, :logger
 
     def initialize
       @base_url = DEFAULT_BASE_URL
       @timeout = DEFAULT_TIMEOUT
       @open_timeout = DEFAULT_OPEN_TIMEOUT
+      @proxy = nil
       @token_store = nil # defaults to Authenticator::MemoryTokenStore, see Authenticator#initialize
     end
 

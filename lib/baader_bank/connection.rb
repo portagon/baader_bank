@@ -9,8 +9,10 @@ module BaaderBank
   # resource calls). Kept separate from Client so Authenticator does not need
   # a full Client instance to bootstrap a token.
   module Connection
-    def self.build(configuration)
-      Faraday.new(url: configuration.base_url) do |conn|
+    module_function
+
+    def build(configuration)
+      Faraday.new(**connection_options(configuration)) do |conn|
         conn.request :multipart
         conn.request :json
         conn.response :json, content_type: /\bjson$/
@@ -20,5 +22,11 @@ module BaaderBank
         conn.adapter Faraday.default_adapter
       end
     end
+
+    def connection_options(configuration)
+      { url: configuration.base_url, proxy: configuration.proxy }
+    end
+
+    private_class_method :connection_options
   end
 end

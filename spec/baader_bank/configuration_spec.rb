@@ -26,4 +26,10 @@ RSpec.describe BaaderBank::Configuration do
       expect(configuration.token_store).to be_nil
     end
   end
+
+  describe '#proxy' do
+    it 'defaults to nil' do
+      expect(configuration.proxy).to be_nil
+    end
+  end
 end
