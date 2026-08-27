@@ -1,7 +1,8 @@
 # Baader Bank
 
 > [!WARNING]
-> **Pre-release:** Features and APIs may change, and breaking changes may occur before the first stable release.
+> **Pre-release:** This project is still under development. Things may change, and breaking changes may occur
+> before the first stable release.
 
 A Ruby client for the [Baader Bank Customer REST API](https://konto.baaderbank.de/apidoc/). It provides
 authentication, token refresh, typed error handling, document uploads, and resource methods for accounts,
