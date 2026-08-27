@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "digest"
+require 'digest'
 
 module BaaderBank
   # Low-level HTTP client plus the domain-specific resource methods mixed in
@@ -29,7 +29,7 @@ module BaaderBank
     # Payments endpoints (SEPA credit transfer / direct debit) take a raw
     # ISO 20022 XML document rather than JSON.
     def post_xml(path, xml_body)
-      request(:post, path, body: xml_body, headers: { "Content-Type" => "application/xml" })
+      request(:post, path, body: xml_body, headers: { 'Content-Type' => 'application/xml' })
     end
 
     def delete(path, params = {})
@@ -41,15 +41,15 @@ module BaaderBank
     # additional form fields (e.g. documentDateTime, customerId).
     # `checksumSha256` is computed automatically unless already present in
     # `fields`.
-    def post_multipart(path, file:, file_field: "zipFile", fields: {})
-      io = file.respond_to?(:read) ? file : File.open(file, "rb")
+    def post_multipart(path, file:, file_field: 'zipFile', fields: {})
+      io = file.respond_to?(:read) ? file : File.open(file, 'rb')
       content = io.read
       io.rewind if io.respond_to?(:rewind)
 
       payload = fields.transform_keys(&:to_s)
-      payload["checksumSha256"] ||= Digest::SHA256.hexdigest(content)
+      payload['checksumSha256'] ||= Digest::SHA256.hexdigest(content)
       payload[file_field] = Faraday::Multipart::FilePart.new(
-        StringIO.new(content), "application/zip", File.basename(file.to_s)
+        StringIO.new(content), 'application/zip', File.basename(file.to_s)
       )
 
       request(:post, path, body: payload)
@@ -61,7 +61,7 @@ module BaaderBank
 
     def request(method, path, params: {}, body: nil, headers: {})
       response = connection.public_send(method, path) do |req|
-        req.headers["Authorization"] = "Bearer #{authenticator.access_token}"
+        req.headers['Authorization'] = "Bearer #{authenticator.access_token}"
         req.headers.update(headers) if headers && !headers.empty?
         req.params.update(params) if params && !params.empty?
         req.body = body if body
@@ -89,13 +89,13 @@ module BaaderBank
     # "The document datetime(ISO 8601). Format: yyyy-MM-ddTHH:mm:ss.SSS"
     # (used by /orders/upload/ordering and /accounts/upload/*).
     def iso8601_millis(time)
-      time.strftime("%Y-%m-%dT%H:%M:%S.%L")
+      time.strftime('%Y-%m-%dT%H:%M:%S.%L')
     end
 
     # "The document datetime (ISO 8601). Format: YYYY-MM-DDThh:mm"
     # (used by /accounts/upload/*).
     def iso8601_minutes(time)
-      time.strftime("%Y-%m-%dT%H:%M")
+      time.strftime('%Y-%m-%dT%H:%M')
     end
   end
 end

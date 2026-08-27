@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "faraday"
-require "faraday/multipart"
+require 'faraday'
+require 'faraday/multipart'
 
 module BaaderBank
   # Builds the shared Faraday connection used by both the Authenticator
@@ -14,7 +14,7 @@ module BaaderBank
         conn.request :multipart
         conn.request :json
         conn.response :json, content_type: /\bjson$/
-        conn.headers["x-api-key"] = configuration.api_key
+        conn.headers['x-api-key'] = configuration.api_key
         conn.options.timeout = configuration.timeout
         conn.options.open_timeout = configuration.open_timeout
         conn.adapter Faraday.default_adapter

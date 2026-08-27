@@ -11,7 +11,7 @@ module BaaderBank
   #     config.pin      = ENV.fetch("BAADER_BANK_PIN")
   #   end
   class Configuration
-    DEFAULT_BASE_URL = "https://konto.baaderbank.de/api/"
+    DEFAULT_BASE_URL = 'https://konto.baaderbank.de/api/'
     DEFAULT_TIMEOUT = 30
     DEFAULT_OPEN_TIMEOUT = 10
 
@@ -29,7 +29,7 @@ module BaaderBank
     # URI joining appends them to the full `base_url` path instead of
     # replacing it - which requires `base_url` to always end in "/".
     def base_url=(url)
-      @base_url = url.to_s.end_with?("/") ? url.to_s : "#{url}/"
+      @base_url = url.to_s.end_with?('/') ? url.to_s : "#{url}/"
     end
   end
 end

@@ -22,12 +22,12 @@ module BaaderBank
         fields[:portfolioNumber] = portfolio_number if portfolio_number
         fields[:currency] = currency if currency
 
-        post_multipart("v2/accounts/upload/opening", file: zip_file, fields: fields)
+        post_multipart('v2/accounts/upload/opening', file: zip_file, fields: fields)
       end
 
       def upload_closing_documents(zip_file, customer_id:, document_date_time: Time.now)
         post_multipart(
-          "accounts/upload/closing",
+          'accounts/upload/closing',
           file: zip_file,
           fields: { customerId: customer_id, documentDateTime: iso8601_minutes(document_date_time) }
         )
@@ -42,7 +42,7 @@ module BaaderBank
         }
         fields[:portfolioNumber] = portfolio_number if portfolio_number
 
-        post_multipart("accounts/upload/changing", file: zip_file, fields: fields)
+        post_multipart('accounts/upload/changing', file: zip_file, fields: fields)
       end
 
       def account_balance(account_number)
@@ -51,8 +51,8 @@ module BaaderBank
 
       def account_transactions(account_number, booking_date: nil, transaction_number_greater_than: nil)
         params = {}
-        params["booking-date"] = booking_date if booking_date
-        params["transaction-number-greater-than"] = transaction_number_greater_than if transaction_number_greater_than
+        params['booking-date'] = booking_date if booking_date
+        params['transaction-number-greater-than'] = transaction_number_greater_than if transaction_number_greater_than
 
         get("accounts/#{account_number}/transactions", params)
       end

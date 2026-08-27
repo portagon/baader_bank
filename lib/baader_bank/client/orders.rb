@@ -14,7 +14,7 @@ module BaaderBank
       # itself confirm the file was processed successfully, only received.
       def upload_order_documents(zip_file, document_date_time: Time.now)
         post_multipart(
-          "orders/upload/ordering",
+          'orders/upload/ordering',
           file: zip_file,
           fields: { documentDateTime: iso8601_millis(document_date_time) }
         )

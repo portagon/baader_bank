@@ -30,23 +30,23 @@ module BaaderBank
       end
 
       def customer_intraday_payments(customer_id, booking_date: nil)
-        params = booking_date ? { "booking-date" => booking_date } : {}
+        params = booking_date ? { 'booking-date' => booking_date } : {}
         get("v2/customers/#{customer_id}/intraday-payments", params)
       end
 
       def customer_intraday_account_openings(customer_id, account_opening_date: nil)
-        params = account_opening_date ? { "account-opening-date" => account_opening_date } : {}
+        params = account_opening_date ? { 'account-opening-date' => account_opening_date } : {}
         get("v2/customers/#{customer_id}/intraday-account-openings", params)
       end
 
       # No v2 replacement documented for interday-* customer endpoints.
       def customer_interday_payments(customer_id, booking_date: nil)
-        params = booking_date ? { "booking-date" => booking_date } : {}
+        params = booking_date ? { 'booking-date' => booking_date } : {}
         get("customers/#{customer_id}/interday-payments", params)
       end
 
       def customer_interday_account_openings(customer_id, account_opening_date: nil)
-        params = account_opening_date ? { "account-opening-date" => account_opening_date } : {}
+        params = account_opening_date ? { 'account-opening-date' => account_opening_date } : {}
         get("customers/#{customer_id}/interday-account-openings", params)
       end
     end

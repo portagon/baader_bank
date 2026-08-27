@@ -48,7 +48,7 @@ module BaaderBank
       # Returns a download URL for the requested file type/date. `file_type`
       # must be one of FILE_TYPES. `file_date` defaults to the current day.
       def zip_file_download_url(file_type, file_date: nil)
-        params = file_date ? { "file-date" => file_date } : {}
+        params = file_date ? { 'file-date' => file_date } : {}
         get("v2/asset-manager/files/#{file_type}", params)
       end
     end

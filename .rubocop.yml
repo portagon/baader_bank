@@ -1,16 +1,10 @@
 AllCops:
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.4
 
 # One class (BaaderBank::Client) is reopened across lib/baader_bank/client/*.rb,
 # one file per OpenAPI tag - each reopening doesn't need its own class-level doc.
 Style/Documentation:
   Enabled: false
-
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
-Style/StringLiteralsInInterpolation:
-  EnforcedStyle: double_quotes
 
 # Upload methods mirror the API's own required/optional field lists.
 Metrics/ParameterLists:

@@ -4,7 +4,7 @@ module BaaderBank
   class Client
     module ModelPortfolios
       def model_portfolios
-        get("model-portfolios")
+        get('model-portfolios')
       end
 
       def model_portfolio(model_portfolio_id)
@@ -12,7 +12,7 @@ module BaaderBank
       end
 
       def create_model_portfolio(attributes)
-        post("model-portfolios", attributes)
+        post('model-portfolios', attributes)
       end
 
       def update_model_portfolio(model_portfolio_id, attributes)

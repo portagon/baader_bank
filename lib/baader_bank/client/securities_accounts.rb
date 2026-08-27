@@ -10,24 +10,24 @@ module BaaderBank
       def securities_account_transactions(securities_account_number, booking_date: nil,
                                           transaction_number_greater_than: nil)
         params = {}
-        params["booking-date"] = booking_date if booking_date
-        params["transaction-number-greater-than"] = transaction_number_greater_than if transaction_number_greater_than
+        params['booking-date'] = booking_date if booking_date
+        params['transaction-number-greater-than'] = transaction_number_greater_than if transaction_number_greater_than
 
         get("securities-accounts/#{securities_account_number}/transactions", params)
       end
 
       def securities_account_performance(securities_account_number, from_date: nil)
-        params = from_date ? { "fromDate" => from_date } : {}
+        params = from_date ? { 'fromDate' => from_date } : {}
         get("securities-accounts/#{securities_account_number}/performance", params)
       end
 
       def investment_profiles(securities_account_number: nil)
-        params = securities_account_number ? { "securities-account-number" => securities_account_number } : {}
-        get("securities-accounts/investment-profiles", params)
+        params = securities_account_number ? { 'securities-account-number' => securities_account_number } : {}
+        get('securities-accounts/investment-profiles', params)
       end
 
       def submit_investment_profiles(attributes)
-        post("securities-accounts/investment-profiles", attributes)
+        post('securities-accounts/investment-profiles', attributes)
       end
 
       # No v2 replacement is documented - deprecated with no alternative listed.

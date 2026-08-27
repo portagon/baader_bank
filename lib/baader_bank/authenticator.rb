@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "monitor"
+require 'monitor'
 
 module BaaderBank
   # Obtains and refreshes the JWT used to authorize resource calls.
@@ -49,7 +49,7 @@ module BaaderBank
     end
 
     def login!
-      response = @connection.post("login") do |req|
+      response = @connection.post('login') do |req|
         req.body = { user_id: @configuration.user_id, pin: @configuration.pin }
       end
       store_identity_response(response)
@@ -58,9 +58,9 @@ module BaaderBank
     end
 
     def refresh!(current_token)
-      response = @connection.post("token/refresh") do |req|
-        req.headers["Authorization"] = "Bearer #{current_token[:access_token]}"
-        req.body = { grant_type: "refresh_token", refresh_token: current_token[:refresh_token] }
+      response = @connection.post('token/refresh') do |req|
+        req.headers['Authorization'] = "Bearer #{current_token[:access_token]}"
+        req.body = { grant_type: 'refresh_token', refresh_token: current_token[:refresh_token] }
       end
       store_identity_response(response)
     rescue Faraday::Error, Error
@@ -72,9 +72,9 @@ module BaaderBank
 
       body = response.body
       token = {
-        access_token: body["access_token"],
-        refresh_token: body["refresh_token"],
-        expires_on: body["expires_on"]
+        access_token: body['access_token'],
+        refresh_token: body['refresh_token'],
+        expires_on: body['expires_on']
       }
       @token_store.write(token)
       token

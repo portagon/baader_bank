@@ -13,7 +13,7 @@ module BaaderBank
       @detail = detail
       @response_body = response_body
 
-      super([status, code, title || detail].compact.join(" "))
+      super([status, code, title || detail].compact.join(' '))
     end
 
     # Builds the right typed error for a given HTTP response, or nil for
@@ -25,9 +25,9 @@ module BaaderBank
       body = body.is_a?(Hash) ? body : {}
       klass.new(
         status: status,
-        code: body["code"],
-        title: body["title"],
-        detail: body["detail"],
+        code: body['code'],
+        title: body['title'],
+        detail: body['detail'],
         response_body: body
       )
     end
